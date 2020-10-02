@@ -145,6 +145,8 @@ def on_callback_query(msg):
                             if (i + 1) % 40 == 0:
                                 bot.sendMessage(from_id, text)
                                 text = ''
+                        if text != '':
+                            bot.sendMessage(from_id, text)
                 else:
                     bot.sendMessage(from_id, 'Log 文件不存在')
 
