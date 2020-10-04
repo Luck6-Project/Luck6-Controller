@@ -56,7 +56,10 @@ def send_log(bot_name: str, chat_id: int):
     if os.path.exists(path):
         with open(path, 'r') as f:
             lines = f.readlines()
-            for i in range(len(lines)):
+            line_cnt = len(lines)
+            char_cnt = len(''.join(lines))
+            bot.sendMessage(chat_id, str(line_cnt) + 'L, ' + str(char_cnt) + 'C')
+            for i in range(line_cnt):
                 text += lines[i]
                 if (i + 1) % 40 == 0:
                     bot.sendMessage(chat_id, text)
