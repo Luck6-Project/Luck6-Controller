@@ -50,6 +50,22 @@ def run_cmd(cmd: str, success: str, chat_id: int):
         print('Set Using False')
         cmd_using = False
 
+def send_log(bot_name: str, chat_id: int):
+    text = ''
+    path = bot_name + '/log'
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            for i in range(len(lines)):
+                text += lines[i]
+                if (i + 1) % 40 == 0:
+                    bot.sendMessage(chat_id, text)
+                    text = ''
+            if text != '':
+                bot.sendMessage(chat_id, text)
+    else:
+        bot.sendMessage(from_id, 'Log 文件不存在')
+
 def get_dirs():
     files = os.listdir(os.getcwd())
     dirs = []
@@ -135,20 +151,7 @@ def on_callback_query(msg):
             elif str_split[0] == 'status':
                 Thread(target=run_cmd, args=(combined_command(str_split[0], str_split[1]), '成功', from_id)).start()
             elif str_split[0] == 'log':
-                text = ''
-                path = str_split[1] + '/log'
-                if os.path.exists(path):
-                    with open(path, 'r') as f:
-                        lines = f.readlines()
-                        for i in range(len(lines)):
-                            text += lines[i]
-                            if (i + 1) % 40 == 0:
-                                bot.sendMessage(from_id, text)
-                                text = ''
-                        if text != '':
-                            bot.sendMessage(from_id, text)
-                else:
-                    bot.sendMessage(from_id, 'Log 文件不存在')
+                Thread(target=send_log, args=(str_split[1], from_id)).start()
 
 bot = telepot.Bot(config.token)
 MessageLoop(bot, {'chat': on_chat_message, 'callback_query': on_callback_query}).run_as_thread()
