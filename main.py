@@ -26,7 +26,7 @@ def auto_timeout():
         time.sleep(1)
 
 def combined_command(operation: str, parameter: str):
-    return os.getcwd() + '/scripts/' + operation + '.sh ' + parameter
+    return f'{os.getcwd()}/scripts/{operation}.sh {parameter}'
 
 def run_cmd(cmd: str, success: str, chat_id: int):
     global cmd_using
@@ -58,7 +58,7 @@ def send_log(bot_name: str, chat_id: int):
             lines = f.readlines()
             line_cnt = len(lines)
             char_cnt = len(''.join(lines))
-            bot.sendMessage(chat_id, str(line_cnt) + 'L, ' + str(char_cnt) + 'C')
+            bot.sendMessage(chat_id, f'{line_cnt}L, {char_cnt}C')
             for i in range(line_cnt):
                 text += lines[i]
                 if (i + 1) % 40 == 0:
@@ -67,7 +67,7 @@ def send_log(bot_name: str, chat_id: int):
             if text != '':
                 bot.sendMessage(chat_id, text)
     else:
-        bot.sendMessage(from_id, 'Log 文件不存在')
+        bot.sendMessage(chat_id, 'Log 文件不存在')
 
 def get_dirs():
     files = os.listdir(os.getcwd())
@@ -86,6 +86,20 @@ def on_chat_message(msg):
     if content_type == 'text':
         if msg['text'] == '/start':
             bot.sendMessage(chat_id, '请选择操作', reply_markup=utils.getInlineKeyboard(config.menu, 3))
+        elif len(msg['text']) > 1:
+            text = msg['text'][1:].split()
+            if text[0] in config.cmd_list_1:
+                if text[0] == 'log':
+                    Thread(target=send_log, args=(text[1], chat_id)).start()
+                else:
+                    Thread(target=run_cmd, args=(combined_command(config.cmd_mapping[text[0]], text[1]), '成功', chat_id)).start()
+            elif text[0] in config.cmd_list_2:
+                global cmd_using
+                if not cmd_using:
+                    set_using()
+                    Thread(target=run_cmd, args=(combined_command(config.cmd_mapping[text[0]], ''), '成功', chat_id)).start()
+                else:
+                    bot.sendMessage(chat_id, '其他人正在使用')
 
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
