@@ -5,7 +5,6 @@ A bot for controlling scp-079 ( https://github.com/scp-079 ) bots
 ## How to use
 
 - [Demo](https://t.me/Luck6_Controller_Bot)
-- Read [the document](https://docs.luck6.net) to learn more
 - [README](https://luck6.net/readme/) of the Luck6-Project.
 - Discuss [group](https://t.me/Luck6_CHAT)
 
